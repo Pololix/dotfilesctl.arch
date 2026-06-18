@@ -1,14 +1,35 @@
+use clap::{Parser, Subcommand};
+
+#[derive(Parser, Debug)] // so that it can turn cli args to a struct
+struct Args {
+    #[command(subcommand)] // means that the cmd field has its own parser
+    cmd: Command,
+}
+
+#[derive(Subcommand, Debug)]
 enum Command {
-    Test,
+    Update, // -Syu + new git fetch or either separately
+
+    Record,  // records currently installed packages
+    Install, // -S + record new package
+    Remove,  // -R + remove old package
 }
 
 fn main() {
-    let argv: Vec<String> = std::env::args().collect();
+    let args = Args::parse();
 
-    let _cmd = match argv[1].as_str() {
-        "test" => Command::Test,
-        _ => return,
-    };
-
-    println!("Appears if cmd = test");
+    match args.cmd {
+        Command::Update => {
+            println!("updating");
+        }
+        Command::Record => {
+            println!("recording");
+        }
+        Command::Install => {
+            println!("installing");
+        }
+        Command::Remove => {
+            println!("removing");
+        }
+    }
 }
