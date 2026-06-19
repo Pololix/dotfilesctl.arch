@@ -1,35 +1,88 @@
 use clap::{Parser, Subcommand};
 
-#[derive(Parser, Debug)] // so that it can turn cli args to a struct
+#[derive(Parser, Debug)]
 struct Args {
-    #[command(subcommand)] // means that the cmd field has its own parser
+    #[command(subcommand)]
     cmd: Command,
 }
 
 #[derive(Subcommand, Debug)]
 enum Command {
-    Update, // -Syu + new git fetch or either separately
+    Deploy,
+    Update {
+        target: Option<String>,
+    },
+    Search {
+        #[arg(short, long)]
+        with: bool,
+        manager: Option<String>,
+        packages: Vec<String>,
+    },
+    Install {
+        #[arg(short, long)]
+        with: bool,
+        #[arg(requires = "with")]
+        manager: Option<String>,
+        packages: Vec<String>,
+    },
+    Remove {
+        packages: Vec<String>,
+    },
+    Record {
+        #[arg(short, long)]
+        print: bool,
+        #[arg(short, long, requires = "print")]
+        groups: bool,
+    },
+    Group {
+        name: String,
+        #[command(subcommand)]
+        action: Action,
+    },
+}
 
-    Record,  // records currently installed packages
-    Install, // -S + record new package
-    Remove,  // -R + remove old package
+#[derive(Subcommand, Debug)]
+enum Action {
+    Create,
+    Delete,
+    Rename { new: String },
+    Add { packages: Vec<String> },
+    Remove { packages: Vec<String> },
+    Print,
 }
 
 fn main() {
     let args = Args::parse();
 
     match args.cmd {
-        Command::Update => {
-            println!("updating");
+        Command::Deploy => {
+            println!("update");
         }
-        Command::Record => {
-            println!("recording");
+        Command::Update { target } => {
+            println!("update");
         }
-        Command::Install => {
-            println!("installing");
+        Command::Search {
+            with,
+            manager,
+            packages,
+        } => {
+            println!("update");
         }
-        Command::Remove => {
-            println!("removing");
+        Command::Install {
+            with,
+            manager,
+            packages,
+        } => {
+            println!("update");
+        }
+        Command::Remove { packages } => {
+            println!("update");
+        }
+        Command::Record { print, groups } => {
+            println!("update");
+        }
+        Command::Group { name, action } => {
+            println!("update");
         }
     }
 }
