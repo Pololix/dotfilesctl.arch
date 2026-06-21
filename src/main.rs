@@ -1,13 +1,13 @@
-use clap::{Parser, Subcommand, error::ContextValue::None};
+use clap::{Parser, Subcommand};
 
 #[derive(Parser, Debug)]
 struct Args {
     #[command(subcommand)]
-    cmd: Command,
+    cmd: Cmd,
 }
 
 #[derive(Subcommand, Debug)]
-enum Command {
+enum Cmd {
     Deploy,
     Update {
         target: Option<String>,
@@ -39,14 +39,14 @@ fn main() {
     let args = Args::parse();
 
     match args.cmd {
-        Command::Deploy => {
+        Cmd::Deploy => {
             println!("clean up whatever writes might have been done by previous deploys");
             println!("set up git globals");
             println!("download recorded packages");
             println!("fecth from github");
             println!("set up symlinks");
         }
-        Command::Update { target } => match target.as_deref() {
+        Cmd::Update { target } => match target.as_deref() {
             Some("system") => {
                 println!("record installed packages");
                 println!("update recorded packages");
@@ -67,7 +67,7 @@ fn main() {
                 println!("set up symlinks");
             }
         },
-        Command::Record { print, groups } => {
+        Cmd::Record { print, groups } => {
             if print {
                 if groups {
                     println!("print record file with groups");
@@ -78,7 +78,7 @@ fn main() {
                 println!("record installed packages");
             }
         }
-        Command::Group { name, action } => match action {
+        Cmd::Group { name, action } => match action {
             Action::Create => {
                 println!("create new group inside the record: {}", name);
             }
