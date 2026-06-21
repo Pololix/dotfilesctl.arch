@@ -1,4 +1,4 @@
-use clap::{Parser, Subcommand};
+use clap::{Parser, Subcommand, error::ContextValue::None};
 
 #[derive(Parser, Debug)]
 struct Args {
@@ -11,22 +11,6 @@ enum Command {
     Deploy,
     Update {
         target: Option<String>,
-    },
-    Search {
-        #[arg(short, long)]
-        with: bool,
-        manager: Option<String>,
-        packages: Vec<String>,
-    },
-    Install {
-        #[arg(short, long)]
-        with: bool,
-        #[arg(requires = "with")]
-        manager: Option<String>,
-        packages: Vec<String>,
-    },
-    Remove {
-        packages: Vec<String>,
     },
     Record {
         #[arg(short, long)]
@@ -56,33 +40,63 @@ fn main() {
 
     match args.cmd {
         Command::Deploy => {
-            println!("update");
+            println!("clean up whatever writes might have been done by previous deploys");
+            println!("set up git globals");
+            println!("download recorded packages");
+            println!("fecth from github");
+            println!("set up symlinks");
         }
-        Command::Update { target } => {
-            println!("update");
-        }
-        Command::Search {
-            with,
-            manager,
-            packages,
-        } => {
-            println!("update");
-        }
-        Command::Install {
-            with,
-            manager,
-            packages,
-        } => {
-            println!("update");
-        }
-        Command::Remove { packages } => {
-            println!("update");
-        }
+        Command::Update { target } => match target.as_deref() {
+            Some("system") => {
+                println!("record installed packages");
+                println!("update recorded packages");
+            }
+            Some("config") => {
+                println!("clean up symlinks");
+                println!("fecth from github");
+                println!("set up symlinks");
+            }
+            Some(package) => {
+                println!("update {}", package);
+            }
+            None => {
+                println!("record installed packages");
+                println!("update recorded packages");
+                println!("clean up symlinks");
+                println!("fecth from github");
+                println!("set up symlinks");
+            }
+        },
         Command::Record { print, groups } => {
-            println!("update");
+            if print {
+                if groups {
+                    println!("print record file with groups");
+                } else {
+                    println!("print record file raw");
+                }
+            } else {
+                println!("record installed packages");
+            }
         }
-        Command::Group { name, action } => {
-            println!("update");
-        }
+        Command::Group { name, action } => match action {
+            Action::Create => {
+                println!("create new group inside the record: {}", name);
+            }
+            Action::Delete => {
+                println!("delete a group from the record: {}", name);
+            }
+            Action::Rename { new } => {
+                println!("rename {} to {}", name, new);
+            }
+            Action::Add { packages } => {
+                println!("adding packages to: {}", name);
+            }
+            Action::Remove { packages } => {
+                println!("removing packages from: {}", name);
+            }
+            Action::Print => {
+                println!("printing {} contents", name);
+            }
+        },
     }
 }
